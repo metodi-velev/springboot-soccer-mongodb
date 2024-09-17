@@ -13,4 +13,5 @@ public interface TeamService {
     List<Team> findAllTeams();
     Team updateTeam(String id, CreateTeamDto createTeamDto);
     Team addPlayersToTeam(String id, List<String> playerIds);
+    Team removePlayersFromTeam(String id, List<String> playerIds);
 }

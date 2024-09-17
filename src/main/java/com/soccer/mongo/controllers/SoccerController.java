@@ -26,36 +26,30 @@ public class SoccerController {
     @GetMapping("/teams")
     public ResponseEntity<List<Team>> getAllTeams() {
         List<Team> allTeams = teamService.findAllTeams();
-
         return new ResponseEntity<>(allTeams, HttpStatus.CREATED);
     }
 
     @PostMapping("/teams")
     public ResponseEntity<Team> createTeam(@RequestBody CreateTeamDto createTeamDto) {
         Team teamCreated = teamService.save(createTeamDto.toTeam());
-
         return new ResponseEntity<>(teamCreated, HttpStatus.CREATED);
     }
 
     @PostMapping("/players")
     public ResponseEntity<Player> createPlayer(@RequestBody CreatePlayerDto createPlayerDto) {
         Player playerCreated = playerService.save(createPlayerDto.toPlayer());
-
         return new ResponseEntity<>(playerCreated, HttpStatus.CREATED);
     }
 
     @PutMapping("/teams/{id}")
     public ResponseEntity<Team> updateTeam(@PathVariable String id, @RequestBody CreateTeamDto createTeamDto) {
-
         Team updatedTeam = teamService.updateTeam(id, createTeamDto);
-
         return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
     }
 
     @DeleteMapping("/teams/{id}")
     public ResponseEntity<Void> deleteTeam(@PathVariable String id) {
         teamService.deleteById(id);
-
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -65,11 +59,15 @@ public class SoccerController {
         return new ResponseEntity<>(playersCreated, HttpStatus.CREATED);
     }
 
-    @PostMapping("/teams/{id}/players")
+    @PostMapping("/teams/{id}/players/add")
     public ResponseEntity<Team> addPlayersToTeam(@PathVariable String id, @RequestBody List<String> playerIds) {
-
         Team updatedTeam = teamService.addPlayersToTeam(id, playerIds);
+        return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
+    }
 
+    @PostMapping("/teams/{id}/players/remove")
+    public ResponseEntity<Team> removePlayersFromTeam(@PathVariable String id, @RequestBody List<String> playerIds) {
+        Team updatedTeam = teamService.removePlayersFromTeam(id, playerIds);
         return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
     }
 }
