@@ -4,7 +4,6 @@ import com.soccer.mongo.dtos.CreateTeamDto;
 import com.soccer.mongo.exception.TeamNotFoundException;
 import com.soccer.mongo.models.Player;
 import com.soccer.mongo.models.Team;
-import com.soccer.mongo.repositories.PlayerRepository;
 import com.soccer.mongo.repositories.TeamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,11 +18,11 @@ import java.util.stream.Collectors;
 public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
-    private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
 
-    public TeamServiceImpl(TeamRepository teamRepository, PlayerRepository playerRepository) {
+    public TeamServiceImpl(TeamRepository teamRepository, PlayerService playerService) {
         this.teamRepository = teamRepository;
-        this.playerRepository = playerRepository;
+        this.playerService = playerService;
     }
 
     @Override
@@ -64,7 +63,7 @@ public class TeamServiceImpl implements TeamService {
                 .orElseThrow(() -> new TeamNotFoundException("Team not found with id: " + id));
 
         Set<Player> playersToAdd = playerIds.stream()
-                .map(playerRepository::findById)
+                .map(playerService::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
