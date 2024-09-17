@@ -1,31 +1,30 @@
 package com.soccer.mongo.exception;
 
-import com.soccer.mongo.dtos.TeamNotFoundResponseDto;
+import com.soccer.mongo.dtos.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @RestControllerAdvice
 public class ExceptionHandling {
 
     @ExceptionHandler(TeamNotFoundException.class)
-    public ResponseEntity<TeamNotFoundResponseDto> teamNotFoundException(TeamNotFoundException exception) {
-        log.error(exception.getMessage());
-        return createHttpResponse(NOT_FOUND, exception.getMessage());
+    public ResponseEntity<ErrorResponseDto> handleTeamNotFoundException(TeamNotFoundException exception) {
+        log.error("Team not found: {}", exception.getMessage(), exception);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
-    private ResponseEntity<TeamNotFoundResponseDto> createHttpResponse(HttpStatusCode httpStatus, String message) {
-        return new ResponseEntity<>(TeamNotFoundResponseDto.builder()
+    private ResponseEntity<ErrorResponseDto> buildErrorResponse(HttpStatus httpStatus, String message) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
                 .httpStatusCode(httpStatus.value())
-                .httpStatus((HttpStatus) httpStatus)
-                .reason(((HttpStatus) httpStatus).getReasonPhrase().toUpperCase())
+                .httpStatus(HttpStatus.valueOf(httpStatus.name()))
+                .reason(httpStatus.getReasonPhrase())
                 .message(message)
-                .build(), httpStatus);
+                .build();
+
+        return ResponseEntity.status(httpStatus).body(errorResponse);
     }
 }

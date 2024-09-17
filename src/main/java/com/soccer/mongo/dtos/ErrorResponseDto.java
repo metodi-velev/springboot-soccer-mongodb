@@ -1,12 +1,12 @@
 package com.soccer.mongo.dtos;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 @Builder
-@Data
-public class TeamNotFoundResponseDto {
+public class ErrorResponseDto {
     private int httpStatusCode;
     private HttpStatus httpStatus;
     private String reason;
