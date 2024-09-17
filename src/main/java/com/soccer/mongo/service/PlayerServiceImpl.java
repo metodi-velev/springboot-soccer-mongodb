@@ -1,5 +1,6 @@
 package com.soccer.mongo.service;
 
+import com.soccer.mongo.dtos.CreatePlayerDto;
 import com.soccer.mongo.models.Player;
 import com.soccer.mongo.repositories.PlayerRepository;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,13 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public List<Player> saveAll(List<Player> players) {
-        return playerRepository.saveAll(players);
+    public List<Player> saveAll(List<CreatePlayerDto> playersDto) {
+        List<Player> playersList = playersDto
+                .stream()
+                .map(CreatePlayerDto::toPlayer)
+                .toList();
+
+        return playerRepository.saveAll(playersList);
     }
 
     @Override

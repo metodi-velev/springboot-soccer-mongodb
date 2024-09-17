@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 public class SoccerController {
@@ -49,18 +46,8 @@ public class SoccerController {
 
     @PutMapping("/teams/{id}")
     public ResponseEntity<Team> updateTeam(@PathVariable String id, @RequestBody CreateTeamDto createTeamDto) {
-        Optional<Team> optionalTeam = teamService.findById(id);
 
-        if (optionalTeam.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Team teamToUpdate = optionalTeam.get()
-                .setAddress(createTeamDto.getAddress())
-                .setName(createTeamDto.getName())
-                .setAcronym(createTeamDto.getAcronym());
-
-        Team updatedTeam = teamService.save(teamToUpdate);
+        Team updatedTeam = teamService.updateTeam(id, createTeamDto);
 
         return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
     }
@@ -74,36 +61,15 @@ public class SoccerController {
 
     @PostMapping("/players/bulk")
     public ResponseEntity<List<Player>> createPlayers(@RequestBody List<CreatePlayerDto> createPlayerDtoList) {
-        List<Player> players = createPlayerDtoList
-                .stream()
-                .map(CreatePlayerDto::toPlayer)
-                .toList();
-
-        List<Player> playersCreated = playerService.saveAll(players);
-
+        List<Player> playersCreated = playerService.saveAll(createPlayerDtoList);
         return new ResponseEntity<>(playersCreated, HttpStatus.CREATED);
     }
 
     @PostMapping("/teams/{id}/players")
     public ResponseEntity<Team> addPlayersToTeam(@PathVariable String id, @RequestBody List<String> playerIds) {
-        Optional<Team> optionalTeam = teamService.findById(id);
 
-        if (optionalTeam.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        Team updatedTeam = teamService.addPlayersToTeam(id, playerIds);
 
-        Team teamToUpdate = optionalTeam.get();
-
-        Set<Player> playersToAdd = playerIds.stream()
-                .map(playerService::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-
-        teamToUpdate.setPlayers(playersToAdd);
-
-        Team teamUpdated = teamService.save(teamToUpdate);
-
-        return new ResponseEntity<>(teamUpdated, HttpStatus.OK);
+        return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
     }
 }
