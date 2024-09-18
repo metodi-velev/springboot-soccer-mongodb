@@ -2,13 +2,17 @@ package com.soccer.mongo.dtos;
 
 import com.soccer.mongo.models.Address;
 import com.soccer.mongo.models.Team;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CreateTeamDto {
     private String name;
 

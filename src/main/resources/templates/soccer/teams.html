@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Core Online Tutorial - List Teams</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css"
+          rel="stylesheet"
+          media="screen"/>
+
+    <style>
+        button#delete-button {
+            background: none;
+            border: none;
+            color: blue;
+            display: inline-block;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .inline-element {
+            display: inline-block;
+            margin-right: -5px; /* Add some space between them if needed */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Teams TM</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Acronym</th>
+            <th>Address</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="team : ${teams}">
+            <td th:text="${team.name}">Team Name</td>
+            <td th:text="${team.acronym}">Team Acronym</td>
+            <td>Team Address
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>Postal Code</th>
+                        <th>Street</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${team.address.city}"></td>
+                        <td th:text="${team.address.postalCode}"></td>
+                        <td th:text="${team.address.street}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td>
+                <a th:href="@{'/teams/' + ${team.id}}" class="inline-element">Edit</a>
+<!--                <a th:href="@{'/teams/delete/' + ${team.id}}" th:method="delete" th:onclick="return confirm('Are you sure?')">Delete</a>-->
+<!--                <form style="display: inline" th:action="@{'/teams/delete/' + ${team.id}}" th:method="delete" th:onclick="return confirm('Are you sure?')">-->
+<!--                    <a>Delete</a>-->
+<!--                </form>-->
+                <form class="inline-element" th:action="@{'/teams/delete/' + ${team.id}}" th:object="${team}" method="post" th:onclick="return confirm('Are you sure?')">
+                    <input type="hidden" name="_method" value="delete" />
+                    <button id="delete-button" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/teams/create">Create New Team</a>
+</div>
+<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+<!-- Bootstrap JS from WebJars -->
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

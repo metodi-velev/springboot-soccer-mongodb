@@ -2,17 +2,20 @@ package com.soccer.mongo.controllers;
 
 import com.soccer.mongo.dtos.CreatePlayerDto;
 import com.soccer.mongo.dtos.CreateTeamDto;
+import com.soccer.mongo.exception.TeamNotFoundException;
 import com.soccer.mongo.models.Player;
 import com.soccer.mongo.models.Team;
 import com.soccer.mongo.service.PlayerService;
 import com.soccer.mongo.service.TeamService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 public class SoccerController {
 
     private final TeamService teamService;
@@ -24,15 +27,29 @@ public class SoccerController {
     }
 
     @GetMapping("/teams")
-    public ResponseEntity<List<Team>> getAllTeams() {
+    public String getAllTeams(Model model) {
         List<Team> allTeams = teamService.findAllTeams();
-        return new ResponseEntity<>(allTeams, HttpStatus.CREATED);
+        model.addAttribute("teams", allTeams);
+        return "/soccer/teams";
+    }
+
+    @GetMapping("/teams/{id}")
+    public String getTeamById(@PathVariable String id, Model model) {
+        Team team = teamService.findById(id).orElseThrow(() -> new TeamNotFoundException("Team not found with id: " + id));
+        model.addAttribute("team", team);
+        return "/soccer/edit_team";
+    }
+
+    @GetMapping("/teams/create")
+    public String showCreateTeamForm(Model model) {
+        model.addAttribute("team", new CreateTeamDto());
+        return "/soccer/create_team";  // returns create_team.html
     }
 
     @PostMapping("/teams")
-    public ResponseEntity<Team> createTeam(@RequestBody CreateTeamDto createTeamDto) {
-        Team teamCreated = teamService.save(createTeamDto.toTeam());
-        return new ResponseEntity<>(teamCreated, HttpStatus.CREATED);
+    public String createTeam(@ModelAttribute CreateTeamDto createTeamDto) {
+        teamService.save(createTeamDto.toTeam());
+        return "redirect:/teams";
     }
 
     @PostMapping("/players")
@@ -42,15 +59,15 @@ public class SoccerController {
     }
 
     @PutMapping("/teams/{id}")
-    public ResponseEntity<Team> updateTeam(@PathVariable String id, @RequestBody CreateTeamDto createTeamDto) {
-        Team updatedTeam = teamService.updateTeam(id, createTeamDto);
-        return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
+    public String updateTeam(@PathVariable String id, @ModelAttribute CreateTeamDto createTeamDto) {
+        teamService.updateTeam(id, createTeamDto);
+        return "redirect:/teams";
     }
 
-    @DeleteMapping("/teams/{id}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable String id) {
+    @DeleteMapping("/teams/delete/{id}")
+    public String deleteTeam(@PathVariable String id) {
         teamService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return "redirect:/teams";
     }
 
     @PostMapping("/players/bulk")
